@@ -8,6 +8,9 @@ const bodyParser = require('body-parser');
 const request = require('request');
 
 const fbMessage = require('./managers/fbMessagesManager');
+const fbMessageType = require('./managers/fbMessageTypesManager');
+
+const helpers = require('./helpers/helper');
 
 const app = express();
 const uuid = require('uuid');
@@ -159,7 +162,7 @@ function receivedMessage(event) {
 
 function handleMessageAttachments(messageAttachments, senderID) {
 	//for now just reply
-	sendTextMessage(senderID, 'Attachment received. Thank you.');
+	fbMessageType.fbMessageType.sendTextMessage(senderID, 'Attachment received. Thank you.');
 }
 
 function handleQuickReply(senderID, quickReply, messageId) {
@@ -185,14 +188,14 @@ function handleApiAiAction(sender, action, responseText, contexts, parameters) {
 		}
 		default:
 			//unhandled action, just send back the text
-			sendTextMessage(sender, responseText);
+			fbMessageType.sendTextMessage(sender, responseText);
 	}
 }
 
 function handleMessage(message, sender) {
 	switch (message.type) {
 		case 0: { //text
-			sendTextMessage(sender, message.speech);
+			fbMessageType.sendTextMessage(sender, message.speech);
 			break;
 		}
 		case 2: {
@@ -207,12 +210,12 @@ function handleMessage(message, sender) {
 					};
 					replies.push(reply);
 				}
-				sendQuickReply(sender, message.title, replies);
+				fbMessageType.sendQuickReply(sender, message.title, replies);
 				break;
 		}
 		case 3: {
 			//image
-				sendImageMessage(sender, message.imageUrl);
+				fbMessageType.sendImageMessage(sender, message.imageUrl);
 				break;
 		}
 		case 4: {
@@ -266,7 +269,7 @@ function handleCardMessages(messages, sender) {
 		};
 		elements.push(element);
 	}
-	sendGenericMessage(sender, elements);
+	fbMessageType.sendGenericMessage(sender, elements);
 }
 
 
@@ -278,9 +281,9 @@ function handleApiAiResponse(sender, response) {
 	const contexts = response.result.contexts;
 	const parameters = response.result.parameters;
 
-	sendTypingOff(sender);
+	fbMessageType.sendTypingOff(sender);
 
-	if (isDefined(messages) && (messages.length === 1 && messages[0].type !== 0
+	if (helpers.isDefined(messages) && (messages.length === 1 && messages[0].type !== 0
 	&& messages.length > 1)) {
 		const timeoutInterval = 1100;
 		let previousType;
@@ -303,329 +306,39 @@ function handleApiAiResponse(sender, response) {
 
 			previousType = messages[i].type;
 		}
-	} else if (responseText === '' && !isDefined(action)) {
+	} else if (responseText === '' && !helpers.isDefined(action)) {
 		//api ai could not evaluate input.
 		console.log('Unknown query ${response.result.resolvedQuery}');
-		sendTextMessage(sender, "I'm not sure what you want. Can you be more specific?");
-	} else if (isDefined(action)) {
+		fbMessageType.sendTextMessage(sender, "I'm not sure what you want. Can you be more specific?");
+	} else if (helpers.isDefined(action)) {
 		handleApiAiAction(sender, action, responseText, contexts, parameters);
-	} else if (isDefined(responseData) && isDefined(responseData.facebook)) {
+	} else if (helpers.isDefined(responseData) && helpers.isDefined(responseData.facebook)) {
 		try {
 			console.log('Response as formatted message ${responseData.facebook}');
-			sendTextMessage(sender, responseData.facebook);
+			fbMessageType.sendTextMessage(sender, responseData.facebook);
 		} catch (err) {
-			sendTextMessage(sender, err.message);
+			fbMessageType.sendTextMessage(sender, err.message);
 		}
-	} else if (isDefined(responseText)) {
-		sendTextMessage(sender, responseText);
+	} else if (helpers.isDefined(responseText)) {
+		fbMessageType.sendTextMessage(sender, responseText);
 	}
 }
 
-function sendToApiAi(sender, text) {
-	sendTypingOn(sender);
+const sendToApiAi = (sender, text) => {
+	fbMessageType.sendTypingOn(sender);
 	const apiaiRequest = apiAiService.textRequest(text, {
 		sessionId: sessionIds.get(sender)
 	});
 
 	apiaiRequest.on('response', (response) => {
-		if (isDefined(response.result)) {
+		if (helpers.isDefined(response.result)) {
 			handleApiAiResponse(sender, response);
 		}
 	});
 
 	apiaiRequest.on('error', (error) => console.error(error));
 	apiaiRequest.end();
-}
-
-const sendTextMessage = (recipientId, text) => {
-	const messageData = {
-		recipient: {
-			id: recipientId
-		},
-		message: {
-			text
-		}
-	};
-	fbMessage.callSendAPI(messageData);
 };
-
-/*
- * Send an image using the Send API.
- *
- */
-const sendImageMessage = (recipientId, imageUrl) => {
-	const messageData = {
-		recipient: {
-			id: recipientId
-		},
-		message: {
-			attachment: {
-				type: 'image',
-				payload: {
-					url: imageUrl
-				}
-			}
-		}
-	};
-
-	fbMessage.callSendAPI(messageData);
-};
-
-/*
- * Send a Gif using the Send API.
- *
- */
-const sendGifMessage = (recipientId) => {
-	const messageData = {
-		recipient: {
-			id: recipientId
-		},
-		message: {
-			attachment: {
-				type: 'image',
-				payload: {
-					url: '${config.SERVER_URL}/assets/instagram_logo.gif'
-				}
-			}
-		}
-	};
-
-	fbMessage.callSendAPI(messageData);
-};
-
-/*
- * Send audio using the Send API.
- *
- */
-const sendAudioMessage = (recipientId) => {
-	const messageData = {
-		recipient: {
-			id: recipientId
-		},
-		message: {
-			attachment: {
-				type: 'audio',
-				payload: {
-					url: '${config.SERVER_URL]/assets/sample.mp3'
-				}
-			}
-		}
-	};
-
-	fbMessage.callSendAPI(messageData);
-};
-
-/*
- * Send a video using the Send API.
- * example videoName: "/assets/allofus480.mov"
- */
-const sendVideoMessage = (recipientId, videoName) => {
-	const messageData = {
-		recipient: {
-			id: recipientId
-		},
-		message: {
-			attachment: {
-				type: 'video',
-				payload: {
-					url: config.SERVER_URL + videoName
-				}
-			}
-		}
-	};
-
-	fbMessage.callSendAPI(messageData);
-};
-
-/*
- * Send a video using the Send API.
- * example fileName: fileName"/assets/test.txt"
- */
-const sendFileMessage = (recipientId, fileName) => {
-	const messageData = {
-		recipient: {
-			id: recipientId
-		},
-		message: {
-			attachment: {
-				type: 'file',
-				payload: {
-					url: config.SERVER_URL + fileName
-				}
-			}
-		}
-	};
-
-	fbMessage.callSendAPI(messageData);
-};
-
-/*
- * Send a button message using the Send API.
- *
- */
-const sendButtonMessage = (recipientId, text, buttons) => {
-	const messageData = {
-		recipient: {
-			id: recipientId
-		},
-		message: {
-			attachment: {
-				type: 'template',
-				payload: {
-					template_type: 'button',
-					text,
-					buttons
-				}
-			}
-		}
-	};
-
-	fbMessage.callSendAPI(messageData);
-};
-
-
-const sendGenericMessage = (recipientId, elements) => {
-	const messageData = {
-		recipient: {
-			id: recipientId
-		},
-		message: {
-			attachment: {
-				type: 'template',
-				payload: {
-					template_type: 'generic',
-					elements
-				}
-			}
-		}
-	};
-
-	fbMessage.callSendAPI(messageData);
-};
-
-
-const sendReceiptMessage = (recipientId, recipientName, currency, paymentMethod,
-							timestamp, elements, address, summary, adjustments) => {
-	// Generate a random receipt ID as the API requires a unique ID
-	const receiptId = 'order${Math.floor(Math.random() * 1000)}';
-
-	const messageData = {
-		recipient: {
-			id: recipientId
-		},
-		message: {
-			attachment: {
-				type: 'template',
-				payload: {
-					template_type: 'receipt',
-					recipientName,
-					order_number: receiptId,
-					currency,
-					paymentMethod,
-					timestamp,
-					elements,
-					address,
-					summary,
-					adjustments
-				}
-			}
-		}
-	};
-
-	fbMessage.callSendAPI(messageData);
-};
-
-/*
- * Send a message with Quick Reply buttons.
- *
- */
-const sendQuickReply = (recipientId, text, replies, metadata) => {
-	const messageData = {
-		recipient: {
-			id: recipientId
-		},
-		message: {
-			text,
-			metadata: isDefined(metadata) ? metadata : '',
-			quick_replies: replies
-		}
-	};
-
-	fbMessage.callSendAPI(messageData);
-};
-
-/*
- * Send a read receipt to indicate the message has been read
- *
- */
-const sendReadReceipt = (recipientId) => {
-	const messageData = {
-		recipient: {
-			id: recipientId
-		},
-		sender_action: 'mark_seen'
-	};
-
-	fbMessage.callSendAPI(messageData);
-};
-
-/*
- * Turn typing indicator on
- *
- */
-const sendTypingOn = (recipientId) => {
-	const messageData = {
-		recipient: {
-			id: recipientId
-		},
-		sender_action: 'typing_on'
-	};
-
-	fbMessage.callSendAPI(messageData);
-};
-
-/*
- * Turn typing indicator off
- *
- */
-const sendTypingOff = (recipientId) => {
-	const messageData = {
-		recipient: {
-			id: recipientId
-		},
-		sender_action: 'typing_off'
-	};
-
-	fbMessage.callSendAPI(messageData);
-};
-
-/*
- * Send a message with the account linking call-to-action
- *
- */
-const sendAccountLinking = (recipientId) => {
-	const messageData = {
-		recipient: {
-			id: recipientId
-		},
-		message: {
-			attachment: {
-				type: 'template',
-				payload: {
-					template_type: 'button',
-					text: 'Welcome. Link your account.',
-					buttons: [{
-						type: 'account_link',
-						url: '${config.SERVER_URL}/authorize'
-          }]
-				}
-			}
-		}
-	};
-
-	fbMessage.callSendAPI(messageData);
-};
-
 
 const greetUserText = (userId) => {
 	//first read user firstname
@@ -641,7 +354,7 @@ const greetUserText = (userId) => {
 					console.log('FB user: %s %s, %s',
 					user.first_name, user.last_name, user.gender);
 					const message = 'Welcome ${user.first_name}!';
-				sendTextMessage(userId, message);
+				fbMessageType.sendTextMessage(userId, message);
 			} else {
 				console.log('Cannot get data for fb user with id',
 					userId);
@@ -671,7 +384,7 @@ const receivedPostback = (event) => {
 	switch (payload) {
 		default:
 			//unindentified payload
-			sendTextMessage(senderID, "I'm not sure what you want. Can you be more specific?");
+			fbMessageType.sendTextMessage(senderID, "I'm not sure what you want. Can you be more specific?");
 			break;
 
 	}
@@ -752,7 +465,7 @@ const receivedDeliveryConfirmation = (event) => {
  * https://developers.facebook.com/docs/messenger-platform/webhook-reference/authentication
  *
  */
-function receivedAuthentication(event) {
+const receivedAuthentication = (event) => {
 	const senderID = event.sender.id;
 	const recipientID = event.recipient.id;
 	const timeOfAuth = event.timestamp;
@@ -770,8 +483,8 @@ function receivedAuthentication(event) {
 
 	// When an authentication is received, we'll send a message back to the sender
 	// to let them know it was successful.
-	sendTextMessage(senderID, 'Authentication successful');
-}
+	fbMessageType.sendTextMessage(senderID, 'Authentication successful');
+};
 
 /*
  * Verify that the callback came from Facebook. Using the App Secret from
@@ -781,7 +494,7 @@ function receivedAuthentication(event) {
  * https://developers.facebook.com/docs/graph-api/webhooks#setup
  *
  */
-function verifyRequestSignature(req, res, buf) {
+const verifyRequestSignature = (req, res, buf) => {
 	const signature = req.headers['x-hub-signature'];
 
 	if (!signature) {
@@ -799,19 +512,7 @@ function verifyRequestSignature(req, res, buf) {
 			throw new Error("Couldn't validate the request signature.");
 		}
 	}
-}
-
-function isDefined(obj) {
-	if (typeof obj === 'undefined') {
-		return false;
-	}
-
-	if (!obj) {
-		return false;
-	}
-
-	return obj != null;
-}
+};
 
 // Spin up the server
 app.listen(app.get('port'), () => {

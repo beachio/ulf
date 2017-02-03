@@ -1,5 +1,5 @@
 const config = require('../config.js');
-// const helpers = require('../helpers/helpers.js');
+const helpers = require('../helpers/helper.js');
 const fbMessage = require('./fbMessagesManager');
 
 const sendTextMessage = (recipientId, text) => {
@@ -211,7 +211,7 @@ const sendQuickReply = (recipientId, text, replies, metadata) => {
 		},
 		message: {
 			text,
-			metadata: isDefined(metadata) ? metadata : '',
+			metadata: helpers.isDefined(metadata) ? metadata : '',
 			quick_replies: replies
 		}
 	};
