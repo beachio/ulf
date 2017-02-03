@@ -7,6 +7,8 @@ const crypto = require('crypto');
 const bodyParser = require('body-parser');
 const request = require('request');
 
+const fbMessage = require('./managers/fbMessagesManager');
+
 const app = express();
 const uuid = require('uuid');
 
@@ -176,6 +178,11 @@ function handleEcho(messageId, appId, metadata) {
 
 function handleApiAiAction(sender, action, responseText, contexts, parameters) {
 	switch (action) {
+		case 0: {
+
+
+			break;
+		}
 		default:
 			//unhandled action, just send back the text
 			sendTextMessage(sender, responseText);
@@ -218,7 +225,7 @@ function handleMessage(message, sender) {
 
 			};
 
-			callSendAPI(messageData);
+			fbMessage.callSendAPI(messageData);
 
 			break;
 		}
@@ -339,7 +346,7 @@ const sendTextMessage = (recipientId, text) => {
 			text
 		}
 	};
-	callSendAPI(messageData);
+	fbMessage.callSendAPI(messageData);
 };
 
 /*
@@ -361,7 +368,7 @@ const sendImageMessage = (recipientId, imageUrl) => {
 		}
 	};
 
-	callSendAPI(messageData);
+	fbMessage.callSendAPI(messageData);
 };
 
 /*
@@ -383,7 +390,7 @@ const sendGifMessage = (recipientId) => {
 		}
 	};
 
-	callSendAPI(messageData);
+	fbMessage.callSendAPI(messageData);
 };
 
 /*
@@ -405,7 +412,7 @@ const sendAudioMessage = (recipientId) => {
 		}
 	};
 
-	callSendAPI(messageData);
+	fbMessage.callSendAPI(messageData);
 };
 
 /*
@@ -427,7 +434,7 @@ const sendVideoMessage = (recipientId, videoName) => {
 		}
 	};
 
-	callSendAPI(messageData);
+	fbMessage.callSendAPI(messageData);
 };
 
 /*
@@ -449,7 +456,7 @@ const sendFileMessage = (recipientId, fileName) => {
 		}
 	};
 
-	callSendAPI(messageData);
+	fbMessage.callSendAPI(messageData);
 };
 
 /*
@@ -473,7 +480,7 @@ const sendButtonMessage = (recipientId, text, buttons) => {
 		}
 	};
 
-	callSendAPI(messageData);
+	fbMessage.callSendAPI(messageData);
 };
 
 
@@ -493,7 +500,7 @@ const sendGenericMessage = (recipientId, elements) => {
 		}
 	};
 
-	callSendAPI(messageData);
+	fbMessage.callSendAPI(messageData);
 };
 
 
@@ -525,14 +532,14 @@ const sendReceiptMessage = (recipientId, recipientName, currency, paymentMethod,
 		}
 	};
 
-	callSendAPI(messageData);
+	fbMessage.callSendAPI(messageData);
 };
 
 /*
  * Send a message with Quick Reply buttons.
  *
  */
-function sendQuickReply(recipientId, text, replies, metadata) {
+const sendQuickReply = (recipientId, text, replies, metadata) => {
 	const messageData = {
 		recipient: {
 			id: recipientId
@@ -544,14 +551,14 @@ function sendQuickReply(recipientId, text, replies, metadata) {
 		}
 	};
 
-	callSendAPI(messageData);
-}
+	fbMessage.callSendAPI(messageData);
+};
 
 /*
  * Send a read receipt to indicate the message has been read
  *
  */
-function sendReadReceipt(recipientId) {
+const sendReadReceipt = (recipientId) => {
 	const messageData = {
 		recipient: {
 			id: recipientId
@@ -559,14 +566,14 @@ function sendReadReceipt(recipientId) {
 		sender_action: 'mark_seen'
 	};
 
-	callSendAPI(messageData);
-}
+	fbMessage.callSendAPI(messageData);
+};
 
 /*
  * Turn typing indicator on
  *
  */
-function sendTypingOn(recipientId) {
+const sendTypingOn = (recipientId) => {
 	const messageData = {
 		recipient: {
 			id: recipientId
@@ -574,8 +581,8 @@ function sendTypingOn(recipientId) {
 		sender_action: 'typing_on'
 	};
 
-	callSendAPI(messageData);
-}
+	fbMessage.callSendAPI(messageData);
+};
 
 /*
  * Turn typing indicator off
@@ -589,7 +596,7 @@ const sendTypingOff = (recipientId) => {
 		sender_action: 'typing_off'
 	};
 
-	callSendAPI(messageData);
+	fbMessage.callSendAPI(messageData);
 };
 
 /*
@@ -616,7 +623,7 @@ const sendAccountLinking = (recipientId) => {
 		}
 	};
 
-	callSendAPI(messageData);
+	fbMessage.callSendAPI(messageData);
 };
 
 
@@ -641,39 +648,6 @@ const greetUserText = (userId) => {
 			}
 		} else {
 			console.error(response.error);
-		}
-	});
-};
-
-/*
- * Call the Send API. The message data goes in the body. If successful, we'll
- * get the message id in a response
- *
- */
-const callSendAPI = (messageData) => {
-	request({
-		uri: 'https://graph.facebook.com/v2.6/me/messages',
-		qs: {
-			access_token: config.FB_PAGE_TOKEN
-		},
-		method: 'POST',
-		json: messageData
-
-	}, (error, response, body) => {
-		if (!error && response.statusCode === 200) {
-			const recipientId = body.recipient_id;
-			const messageId = body.message_id;
-
-			if (messageId) {
-				console.log('Successfully sent message with id %s to recipient %s',
-					messageId, recipientId);
-			} else {
-				console.log('Successfully called Send API for recipient %s',
-					recipientId);
-			}
-		} else {
-			console.error('Failed calling Send API',
-			response.statusCode, response.statusMessage, body.error);
 		}
 	});
 };
