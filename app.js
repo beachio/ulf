@@ -30,34 +30,6 @@ if (!config.SERVER_URL) { //used for ink to static files
 
 app.set('port', (process.env.PORT || 5000));
 
-/*
- * Verify that the callback came from Facebook. Using the App Secret from
- * the App Dashboard, we can verify the signature that is sent with each
- * callback in the x-hub-signature field, located in the header.
- *
- * https://developers.facebook.com/docs/graph-api/webhooks#setup
- *
- */
-const verifyRequestSignature = (req, res, buf) => {
-	const signature = req.headers['x-hub-signature'];
-
-	if (!signature) {
-		throw new Error('Couldn\'t validate the signature.');
-	} else {
-		const elements = signature.split('=');
-		// const method = elements[0];
-		const signatureHash = elements[1];
-
-		const expectedHash = crypto.createHmac('sha1', config.FB_APP_SECRET)
-			.update(buf)
-			.digest('hex');
-
-		if (signatureHash !== expectedHash) {
-			throw new Error('Couldnt validate the request signature.');
-		}
-	}
-};
-
 app.use(bodyParser.json({
 	verify: verifyRequestSignature
 }));
@@ -135,29 +107,58 @@ app.post('/webhook/', (req, res) => {
 	}
 });
 
-const greetUserText = (userId) => {
-	//first read user firstname
-	request({
-		uri: 'https://graph.facebook.com/v2.7/${userId}',
-		qs: {
-			access_token: config.FB_PAGE_TOKEN
+// const greetUserText = (userId) => {
+// 	//first read user firstname
+// 	request({
+// 		uri: 'https://graph.facebook.com/v2.7/${userId}',
+// 		qs: {
+// 			access_token: config.FB_PAGE_TOKEN
+// 		}
+// 	}, (error, response, body) => {
+// 		if (!error && response.statusCode === 200) {
+// 			const user = JSON.parse(body);
+// 			if (user.first_name) {
+// 					console.log('FB user: %s %s, %s',
+// 					user.first_name, user.last_name, user.gender);
+// 					const message = 'Welcome ${user.first_name}!';
+// 				fbMessageType.sendTextMessage(userId, message);
+// 			} else {
+// 				console.log('Cannot get data for fb user with id',
+// 					userId);
+// 			}
+// 		} else {
+// 			console.error(response.error);
+// 		}
+// 	});
+// };
+
+/*
+ * Verify that the callback came from Facebook. Using the App Secret from
+ * the App Dashboard, we can verify the signature that is sent with each
+ * callback in the x-hub-signature field, located in the header.
+ *
+ * https://developers.facebook.com/docs/graph-api/webhooks#setup
+ *
+ */
+
+const verifyRequestSignature = (req, res, buf) => {
+	const signature = req.headers['x-hub-signature'];
+
+	if (!signature) {
+		throw new Error('Couldn\'t validate the signature.');
+	} else {
+		const elements = signature.split('=');
+		// const method = elements[0];
+		const signatureHash = elements[1];
+
+		const expectedHash = crypto.createHmac('sha1', config.FB_APP_SECRET)
+			.update(buf)
+			.digest('hex');
+
+		if (signatureHash !== expectedHash) {
+			throw new Error('Couldnt validate the request signature.');
 		}
-	}, (error, response, body) => {
-		if (!error && response.statusCode === 200) {
-			const user = JSON.parse(body);
-			if (user.first_name) {
-					console.log('FB user: %s %s, %s',
-					user.first_name, user.last_name, user.gender);
-					const message = 'Welcome ${user.first_name}!';
-				fbMessageType.sendTextMessage(userId, message);
-			} else {
-				console.log('Cannot get data for fb user with id',
-					userId);
-			}
-		} else {
-			console.error(response.error);
-		}
-	});
+	}
 };
 
 // Spin up the server

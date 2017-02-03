@@ -8,7 +8,7 @@ const sendTextMessage = (recipientId, text) => {
 			id: recipientId
 		},
 		message: {
-			text
+			text: text
 		}
 	};
 	fbMessage.callSendAPI(messageData);

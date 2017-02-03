@@ -1,5 +1,4 @@
 const uuid = require('uuid');
-const config = require('../config');
 const helpers = require('../helpers/helper');
 const apiAiMessage = require('../managers/apiAiMessageManager');
 const fbMessageType = require('../managers/fbMessageTypesManager');
