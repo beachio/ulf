@@ -3,9 +3,7 @@ const crypto = require('crypto');
 const config = require('./config');
 const express = require('express');
 const bodyParser = require('body-parser');
-const request = require('request');
 
-const fbMessageType = require('./managers/fbMessageTypesManager');
 const fbMessageHandler = require('./src/fbMessageHandler');
 
 const app = express();
@@ -30,6 +28,7 @@ if (!config.SERVER_URL) { //used for ink to static files
 
 app.set('port', (process.env.PORT || 5000));
 
+//verify request came from facebook
 app.use(bodyParser.json({
 	verify: verifyRequestSignature
 }));
