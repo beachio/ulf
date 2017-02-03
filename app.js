@@ -31,8 +31,10 @@ if (!config.SERVER_URL) { //used for ink to static files
 app.set('port', (process.env.PORT || 5000));
 
 //verify request came from facebook
+let verifyRequestSignature = fbMessageHandler.verifyRequestSignature;
+
 app.use(bodyParser.json({
-	verify: fbMessageHandler.verifyRequestSignature
+	verify: verifyRequestSignature
 }));
 
 //serve static files in the public directory
