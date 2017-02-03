@@ -184,26 +184,31 @@ function handleApiAiAction(sender, action, responseText, contexts, parameters) {
 
 function handleMessage(message, sender) {
 	switch (message.type) {
-		case 0: //text
+		case 0: { //text
 			sendTextMessage(sender, message.speech);
 			break;
-		case 2: //quick replies
-			const replies = [];
-			for (let b = 0; b < message.replies.length; b++) {
-				const reply =
-				{
-					content_type: 'text',
-					title: message.replies[b],
-					payload: message.replies[b]
-				};
-				replies.push(reply);
-			}
-			sendQuickReply(sender, message.title, replies);
-			break;
-		case 3: //image
-			sendImageMessage(sender, message.imageUrl);
-			break;
-		case 4:
+		}
+		case 2: {
+			//quick replies
+				const replies = [];
+				for (let b = 0; b < message.replies.length; b++) {
+					const reply =
+					{
+						content_type: 'text',
+						title: message.replies[b],
+						payload: message.replies[b]
+					};
+					replies.push(reply);
+				}
+				sendQuickReply(sender, message.title, replies);
+				break;
+		}
+		case 3: {
+			//image
+				sendImageMessage(sender, message.imageUrl);
+				break;
+		}
+		case 4: {
 			// custom payload
 			const messageData = {
 				recipient: {
@@ -216,6 +221,8 @@ function handleMessage(message, sender) {
 			callSendAPI(messageData);
 
 			break;
+		}
+		// no default
 	}
 }
 
@@ -323,7 +330,7 @@ function sendToApiAi(sender, text) {
 	apiaiRequest.end();
 }
 
-function sendTextMessage(recipientId, text) {
+const sendTextMessage = (recipientId, text) => {
 	const messageData = {
 		recipient: {
 			id: recipientId
@@ -333,13 +340,13 @@ function sendTextMessage(recipientId, text) {
 		}
 	};
 	callSendAPI(messageData);
-}
+};
 
 /*
  * Send an image using the Send API.
  *
  */
-function sendImageMessage(recipientId, imageUrl) {
+const sendImageMessage = (recipientId, imageUrl) => {
 	const messageData = {
 		recipient: {
 			id: recipientId
@@ -355,13 +362,13 @@ function sendImageMessage(recipientId, imageUrl) {
 	};
 
 	callSendAPI(messageData);
-}
+};
 
 /*
  * Send a Gif using the Send API.
  *
  */
-function sendGifMessage(recipientId) {
+const sendGifMessage = (recipientId) => {
 	const messageData = {
 		recipient: {
 			id: recipientId
@@ -377,13 +384,13 @@ function sendGifMessage(recipientId) {
 	};
 
 	callSendAPI(messageData);
-}
+};
 
 /*
  * Send audio using the Send API.
  *
  */
-function sendAudioMessage(recipientId) {
+const sendAudioMessage = (recipientId) => {
 	const messageData = {
 		recipient: {
 			id: recipientId
@@ -399,13 +406,13 @@ function sendAudioMessage(recipientId) {
 	};
 
 	callSendAPI(messageData);
-}
+};
 
 /*
  * Send a video using the Send API.
  * example videoName: "/assets/allofus480.mov"
  */
-function sendVideoMessage(recipientId, videoName) {
+const sendVideoMessage = (recipientId, videoName) => {
 	const messageData = {
 		recipient: {
 			id: recipientId
@@ -421,13 +428,13 @@ function sendVideoMessage(recipientId, videoName) {
 	};
 
 	callSendAPI(messageData);
-}
+};
 
 /*
  * Send a video using the Send API.
  * example fileName: fileName"/assets/test.txt"
  */
-function sendFileMessage(recipientId, fileName) {
+const sendFileMessage = (recipientId, fileName) => {
 	const messageData = {
 		recipient: {
 			id: recipientId
@@ -443,13 +450,13 @@ function sendFileMessage(recipientId, fileName) {
 	};
 
 	callSendAPI(messageData);
-}
+};
 
 /*
  * Send a button message using the Send API.
  *
  */
-function sendButtonMessage(recipientId, text, buttons) {
+const sendButtonMessage = (recipientId, text, buttons) => {
 	const messageData = {
 		recipient: {
 			id: recipientId
@@ -467,10 +474,10 @@ function sendButtonMessage(recipientId, text, buttons) {
 	};
 
 	callSendAPI(messageData);
-}
+};
 
 
-function sendGenericMessage(recipientId, elements) {
+const sendGenericMessage = (recipientId, elements) => {
 	const messageData = {
 		recipient: {
 			id: recipientId
@@ -487,11 +494,11 @@ function sendGenericMessage(recipientId, elements) {
 	};
 
 	callSendAPI(messageData);
-}
+};
 
 
-function sendReceiptMessage(recipientId, recipientName, currency, paymentMethod,
-							timestamp, elements, address, summary, adjustments) {
+const sendReceiptMessage = (recipientId, recipientName, currency, paymentMethod,
+							timestamp, elements, address, summary, adjustments) => {
 	// Generate a random receipt ID as the API requires a unique ID
 	const receiptId = 'order${Math.floor(Math.random() * 1000)}';
 
@@ -519,7 +526,7 @@ function sendReceiptMessage(recipientId, recipientName, currency, paymentMethod,
 	};
 
 	callSendAPI(messageData);
-}
+};
 
 /*
  * Send a message with Quick Reply buttons.
