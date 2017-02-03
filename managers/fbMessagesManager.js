@@ -1,6 +1,6 @@
 const request = require('request');
 const config = require('../config.js');
-// const helpers = require('../helpers/helpers.js');
+
 /*
  * Call the Send API. The message data goes in the body. If successful, we'll
  * get the message id in a response
@@ -8,10 +8,10 @@ const config = require('../config.js');
  */
 
  /*
-  * Call the Send API. The message data goes in the body. If successful, we'll
-  * get the message id in a response
-  *
-  */
+	* Call the Send API. The message data goes in the body. If successful, we'll
+	* get the message id in a response
+	*
+	*/
 const callSendAPI = (messageData) => {
 	request({
 		uri: 'https://graph.facebook.com/v2.6/me/messages',
@@ -41,5 +41,5 @@ const callSendAPI = (messageData) => {
 };
 
 module.exports = {
-  callSendAPI
+	callSendAPI
 };

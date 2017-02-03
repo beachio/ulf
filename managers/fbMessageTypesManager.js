@@ -14,6 +14,27 @@ const sendTextMessage = (recipientId, text) => {
 	fbMessage.callSendAPI(messageData);
 };
 
+const sendListMessage = (recipientId, elements, buttons) => {
+	var messageData = {
+		recipient: {
+			id: recipientId
+		},
+		message: {
+			attachment: {
+				type: 'template',
+				payload: {
+					template_type: 'list',
+					elements: elements,
+					buttons: buttons
+				}
+			}
+		}
+	};
+	fbMessage.callSendAPI(messageData);
+	console.log(messageData);
+	console.log('List Message Sent');
+};
+
 /*
  * Send an image using the Send API.
  *
@@ -282,11 +303,27 @@ const sendAccountLinking = (recipientId) => {
 					buttons: [{
 						type: 'account_link',
 						url: '${config.SERVER_URL}/authorize'
-          }]
+					}]
 				}
 			}
 		}
 	};
 
 	fbMessage.callSendAPI(messageData);
+};
+
+module.exports = {
+	sendTextMessage,
+	sendListMessage,
+	sendImageMessage,
+	sendGifMessage,
+	sendVideoMessage,
+	sendAudioMessage,
+	sendButtonMessage,
+	sendFileMessage,
+	sendGenericMessage,
+	sendQuickReply,
+	sendAccountLinking,
+	sendTypingOn,
+	sendTypingOff
 };
