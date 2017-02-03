@@ -140,7 +140,7 @@ app.post('/webhook/', (req, res) => {
  *
  */
 
-const verifyRequestSignature = (req, res, buf) => {
+function verifyRequestSignature(req, res, buf) {
 	const signature = req.headers['x-hub-signature'];
 
 	if (!signature) {
@@ -158,7 +158,7 @@ const verifyRequestSignature = (req, res, buf) => {
 			throw new Error('Couldnt validate the request signature.');
 		}
 	}
-};
+}
 
 // Spin up the server
 app.listen(app.get('port'), () => {
