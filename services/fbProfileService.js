@@ -6,7 +6,7 @@ const greetUserText = (userId) => {
 	//first read user firstname
 	console.log('fetching info from Facebook');
 	request({
-		uri: 'https://graph.facebook.com/v2.7/${userId}',
+		uri: 'https://graph.facebook.com/v2.7/%s', userId,
 		qs: {
 			access_token: config.FB_PAGE_TOKEN
 		}
