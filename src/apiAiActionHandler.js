@@ -5,6 +5,7 @@ const fbProfile = require('../services/fbProfileService');
 const handleApiAiAction = (sender, action, responseText, contexts, parameters) => {
 	switch (action) {
 	case 'personalised-welcome': {
+		console.log('Sending Welcome Message');
 		fbProfile.greetUserText(sender);
 		break;
 	}
