@@ -1,13 +1,11 @@
 const helpers = require('../helpers/helper');
 const fbMessageType = require('../managers/fbMessageTypesManager');
+const fbProfile = require('../services/fbProfileService');
 
 const handleApiAiAction = (sender, action, responseText, contexts, parameters) => {
 	switch (action) {
 	case 'personalised-welcome': {
-		fbMessageType.sendTextMessage(sender, 'Hi there');
-		fbMessageType.sendTypingOn(sender);
-		setTimeout(function(){
-		}, 2000);
+		fbProfile.greetUserText(sender);
 		break;
 	}
 	default:
