@@ -1,4 +1,4 @@
-const request = require('require');
+const request = require('request');
 const config = require('../helpers/helper');
 const fbMessageType = require('../managers/fbMessageTypesManager');
 
