@@ -23,7 +23,7 @@ const greetUserText = (userId) => {
 					userId);
 			}
 		} else {
-			console.error(response.error);
+			console.error('Error is ${response.error}');
 		}
 	});
 };
