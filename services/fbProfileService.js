@@ -4,7 +4,7 @@ const fbMessageType = require('../managers/fbMessageTypesManager');
 
 const greetUserText = (userId) => {
 	//first read user firstname
-	console.log('fetching info from Facebook');
+	console.log('fetching info from Facebook for user: %s', userId);
 	request({
 		uri: 'https://graph.facebook.com/v2.7/' + userId,
 		qs: {
