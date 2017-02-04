@@ -1,6 +1,7 @@
 const helpers = require('../helpers/helper');
 const fbMessageType = require('../managers/fbMessageTypesManager');
 const fbMessage = require('../managers/fbMessagesManager');
+const apiAiAction = require('./apiAiActionHandler');
 
 const handleMessage = (message, sender) => {
 	switch (message.type) {
@@ -121,7 +122,7 @@ const handleApiAiResponse = (sender, response) => {
 		console.log('Unknown query ${response.result.resolvedQuery}');
 		fbMessageType.sendTextMessage(sender, 'I&rsquo;m not sure what you want. Can you be more specific?');
 	} else if (helpers.isDefined(action)) {
-		handleApiAiAction(sender, action, responseText, contexts, parameters);
+		apiAiAction.handleApiAiAction(sender, action, responseText, contexts, parameters);
 	} else if (helpers.isDefined(responseData) && helpers.isDefined(responseData.facebook)) {
 		try {
 			console.log('Response as formatted message ${responseData.facebook}');
@@ -134,20 +135,8 @@ const handleApiAiResponse = (sender, response) => {
 	}
 };
 
-const handleApiAiAction = (sender, action, responseText, contexts, parameters) => {
-	switch (action) {
-	case 0: {
-		break;
-	}
-	default:
-		//unhandled action, just send back the text
-		fbMessageType.sendTextMessage(sender, responseText);
-	}
-};
-
 module.exports = {
 	handleMessage,
 	handleCardMessages,
-	handleApiAiResponse,
-	handleApiAiAction
+	handleApiAiResponse
 };
