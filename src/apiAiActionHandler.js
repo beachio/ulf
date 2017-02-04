@@ -5,14 +5,14 @@ const handleApiAiAction = (sender, action, responseText, contexts, parameters) =
 	switch (action) {
 	case 'personalised-welcome': {
 		if (helpers.isDefined(contexts[0] && contexts[0].name == 'default-welcome')) {
-			fbMessageType.messageManager.sendTextMessage(sender, 'Hi there');
-			fbMessageType.messageManager.sendTypingOn(sender);
+			fbMessageType.sendTextMessage(sender, 'Hi there');
+			fbMessageType.sendTypingOn(sender);
 			setTimeout(function(){
 
 			}, 2000);
 
 		} else {
-			fbMessageType.messageManager.sendTextMessage(sender, 'Bonjour');
+			fbMessageType.sendTextMessage(sender, 'Bonjour');
 		}
 		break;
 	}
