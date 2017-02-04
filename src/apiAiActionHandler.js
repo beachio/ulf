@@ -4,16 +4,10 @@ const fbMessageType = require('../managers/fbMessageTypesManager');
 const handleApiAiAction = (sender, action, responseText, contexts, parameters) => {
 	switch (action) {
 	case 'personalised-welcome': {
-		if (helpers.isDefined(contexts[0] && contexts[0].name == 'default-welcome')) {
-			fbMessageType.sendTextMessage(sender, 'Hi there');
-			fbMessageType.sendTypingOn(sender);
-			setTimeout(function(){
-
-			}, 2000);
-
-		} else {
-			fbMessageType.sendTextMessage(sender, 'Bonjour');
-		}
+		fbMessageType.sendTextMessage(sender, 'Hi there');
+		fbMessageType.sendTypingOn(sender);
+		setTimeout(function(){
+		}, 2000);
 		break;
 	}
 	default:
