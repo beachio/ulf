@@ -1,5 +1,5 @@
 const config = require('../config');
-const fbMessageType = require('.../managers/fbMessageTypesManager');
+const fbMessageType = require('../managers/fbMessageTypesManager');
 
 const startOnboarding = (userId) => {
 	const messageOne = 'Hi. My name is ' + config.BOT_NAME;
