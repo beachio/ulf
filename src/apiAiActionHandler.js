@@ -1,12 +1,12 @@
 const helpers = require('../helpers/helper');
 const fbMessageType = require('../managers/fbMessageTypesManager');
 const fbProfile = require('../services/fbProfileService');
+const onboarding = require('../stories/onboarding');
 
 const handleApiAiAction = (sender, action, responseText, contexts, parameters) => {
 	switch (action) {
 	case 'personalised-welcome': {
-		console.log('Sending Welcome Message');
-		fbProfile.greetUserText(sender);
+		onboarding.startOnboarding(sender);
 		break;
 	}
 	default:
