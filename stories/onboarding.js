@@ -27,3 +27,7 @@ const startOnboarding = (userId) => {
 		fbMessageType.sendQuickReply(userId, messageFour, replies);
 	}, 3000);
 };
+
+module.exports = {
+	startOnboarding
+};
