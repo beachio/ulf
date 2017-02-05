@@ -6,8 +6,8 @@ Parse.initialize(config.PARSE_APP_ID, config.PARSE_MASTER_KEY);
 Parse.serverURL = config.PARSE_URL;
 
 const setUserInfo = (userId) => {
-	let User = Parse.Object.extend('User');
-	let user = new User();
+	let User = Parse.Object.extend('Person');
+	let user = new Person();
 	user.set(config.FB_TOKEN, userId);
 
 	return new Promise(function(resolve, reject){
