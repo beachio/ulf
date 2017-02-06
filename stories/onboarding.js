@@ -6,9 +6,7 @@ const startOnboarding = (userId) => {
 	const messageTwo = 'I am at your service';
 	const messageThree = 'I am here to help you build and manage your web projects';
 	const messageFour = 'Tell me the name of the town or city where you live...';
-	const image = config.SERVER_URL + '/assets/picniq-screen.jpg';
 
-	fbMessageType.sendImageMessage(userId, image);
 	fbMessageType.sendTextMessage(userId, messageOne);
 	setTimeout(function(){
 		fbMessageType.sendTextMessage(userId, messageTwo);

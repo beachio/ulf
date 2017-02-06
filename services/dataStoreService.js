@@ -1,15 +1,14 @@
 var Parse = require('parse/node');
-var config = require('../config.js');
-var helpers = require('../helpers/helper.js');
+var config = require('../config');
+var helpers = require('../helpers/helper');
 
-Parse.initialize(config.PARSE_APP_ID, config.PARSE_MASTER_KEY);
+Parse.initialize(config.PARSE_APP_ID, config.PARSE_JAVASCRIPT_KEY);
 Parse.serverURL = config.PARSE_URL;
 
 const setUserInfo = (userId) => {
 	let Person = Parse.Object.extend('Person');
 	let user = new Person();
-	user.set(config.FB_TOKEN, userId);
-
+	user.set('fbId', userId);
 	return new Promise(function(resolve, reject){
 		user.save()
 			.then(function(user){
@@ -18,7 +17,7 @@ const setUserInfo = (userId) => {
 			})
 			.catch(function(error){
 				console.log('Error Saving User: ' + error);
-				reject(error.description);
+				reject(error);
 			});
 	});
 };

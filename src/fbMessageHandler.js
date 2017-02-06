@@ -45,7 +45,7 @@ const receivedMessage = (event) => {
 
 const handleMessageAttachments = (messageAttachments, senderID) => {
 	//for now just reply
-	fbMessageType.fbMessageType.sendTextMessage(senderID, 'Attachment received. Thank you.');
+	fbMessageType.sendTextMessage(senderID, 'Attachment received. Thank you.');
 };
 
 const handleQuickReply = (senderID, quickReply, messageId) => {
