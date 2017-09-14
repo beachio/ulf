@@ -2,7 +2,7 @@ const config = require('../config.js');
 const helpers = require('../helpers/helper.js');
 const fbMessage = require('./fbMessagesManager');
 
-const sendTextMessage = (recipientId, text) => {
+const sendTextMessage = (recipientId, text, delay) => {
 	const messageData = {
 		recipient: {
 			id: recipientId
@@ -11,7 +11,13 @@ const sendTextMessage = (recipientId, text) => {
 			text: text
 		}
 	};
-	fbMessage.callSendAPI(messageData);
+	if (delay && delay !== 0.0) {
+		setTimeout(function(){
+			fbMessage.callSendAPI(messageData);
+		}, delay);
+	} else {
+		fbMessage.callSendAPI(messageData);
+	}
 };
 
 const sendListMessage = (recipientId, elements, buttons) => {

@@ -2,6 +2,7 @@ const uuid = require('uuid');
 const helpers = require('../helpers/helper');
 const apiAiMessage = require('../managers/apiAiMessageManager');
 const fbMessageType = require('../managers/fbMessageTypesManager');
+const siteMenu = require('../stories/siteMenu');
 
 const receivedMessage = (event) => {
 	const senderID = event.sender.id;
@@ -79,6 +80,10 @@ const receivedPostback = (event) => {
 	const payload = event.postback.payload;
 
 	switch (payload) {
+	case 'SITE_CHANGE_SETTINGS': {
+		siteMenu.siteSettingsMenu(senderID);
+		break;
+	}
 	default:
 			//unindentified payload
 		fbMessageType.sendTextMessage(senderID, 'I&rsquo;m not sure what you want. Can you be more specific?');
